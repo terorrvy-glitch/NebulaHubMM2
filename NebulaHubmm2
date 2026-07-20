@@ -2165,13 +2165,28 @@ function CreateMainGUI()
 		return candidates[1]
 	end
 
-	local function clickButton(button)
-		if button and button:IsA("GuiButton") then
-			button:Activate()
-			return true
-		end
-		return false
-	end
+local function clickButton(button)
+    if not button then return false end
+    -- сначала пытаемся вызвать событие MouseButton1Click (работает для любого GuiObject)
+    local event = button:FindFirstChild("MouseButton1Click")
+    if event then
+        event:Fire()
+        return true
+    end
+    -- если это настоящая GuiButton – пробуем Activate
+    if button:IsA("GuiButton") then
+        local success = pcall(function() button:Activate() end)
+        if success then return true end
+    end
+    -- ищем внутри кнопки другую кликабельную часть
+    for _, child in ipairs(button:GetChildren()) do
+        if child:IsA("TextButton") or child:IsA("ImageButton") then
+            pcall(function() child:Activate() end)
+            return true
+        end
+    end
+    return false
+end
 
 	local function sendTradeRequest(targetPlayer)
 		-- Нажимаем ActionButton в строке игрока в лидерборде
