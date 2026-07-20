@@ -762,9 +762,6 @@ function ShowKeyWindow()
 			task.wait(0.5)
 			g:Destroy()
 
-			if IsMobile then
-				CreateFloatingButton()
-			else
 				CreateMainGUI()
 			end
 		else
