@@ -1,5 +1,5 @@
--- NEBULA HUB v1.5.3 (тест мобильного интерфейса на ПК, логотип непрозрачный, прокрутка вкладок)
--- IsMobile = true для проверки; замените на UserInputService.TouchEnabled для реальных устройств
+-- NEBULA HUB v1.5.3 (Full ESP fix, mobile UI improvements)
+-- IsMobile = true for testing, replace with UserInputService.TouchEnabled for real devices
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -10,10 +10,10 @@ local Lighting = game:GetService("Lighting")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- ★ ВРЕМЕННО ДЛЯ ТЕСТА МОБИЛЬНОГО РЕЖИМА ★
-local IsMobile = true  -- измените на UserInputService.TouchEnabled, когда закончите тестирование
+-- ★ For testing mobile UI on PC ★
+local IsMobile = false -- set to UserInputService.TouchEnabled later
 
--- ===== ЛОКАЛИЗАЦИЯ =====
+-- ===== LOCALIZATION =====
 local L = {
 	ru = {
 		tab_home = "Главная", tab_combat = "Бой", tab_esp = "ESP", tab_move = "Движение", tab_visuals = "Визуал",
@@ -80,7 +80,8 @@ local L = {
 		role_sheriff = "Шериф", role_murderer = "Убийца", role_innocent = "Невинный",
 		hub_name = "NEBULA HUB",
 		hub_version = "v1.5.3",
-		patch_notes_text = [[• Трекинг монет через CoinCollected (100% точность)
+		patch_notes_text = [[• ESP исправлен, толщина трассеров обновляется
+    • Трекинг монет через CoinCollected (100% точность)
     • XP Farm: мардер убивает всех перед телепортом в лобби
     • Адаптация под мобильные устройства (уменьшенный GUI, плавающая кнопка)]],
 		credits_text = [[Nebula Hub by simsoni228 & 0cdd
@@ -160,7 +161,8 @@ local L = {
 		role_sheriff = "Sheriff", role_murderer = "Murderer", role_innocent = "Innocent",
 		hub_name = "NEBULA HUB",
 		hub_version = "v1.5.3",
-		patch_notes_text = [[• Coin tracking via CoinCollected (100% accurate)
+		patch_notes_text = [[• ESP fixed, tracer thickness updates
+    • Coin tracking via CoinCollected (100% accurate)
     • XP Farm: murderer kills all before teleporting to lobby
     • Mobile support (smaller GUI, floating button)]],
 		credits_text = [[Nebula Hub by simsoni228 & 0cdd
@@ -186,7 +188,7 @@ local function translate(key, ...)
 	return str
 end
 
--- ===== ТЕМЫ =====
+-- ===== THEMES =====
 local Themes = {
 	["Deep Ocean"] = { MainBg = Color3.fromRGB(11, 15, 25), MainBgTransparency = 0.2, SidebarBg = Color3.fromRGB(8, 12, 20), HeaderBg = Color3.fromRGB(15, 20, 35), Accent = Color3.fromRGB(0, 191, 255), AccentLight = Color3.fromRGB(0, 150, 255), Text = Color3.fromRGB(255, 255, 255), SubText = Color3.fromRGB(200, 200, 200), Stroke = Color3.fromRGB(0, 191, 255), Button = Color3.fromRGB(0, 120, 255), ToggleOn = Color3.fromRGB(0, 191, 255), ToggleOff = Color3.fromRGB(60, 65, 80), SliderFill = Color3.fromRGB(0, 191, 255), Panel = Color3.fromRGB(20, 25, 40), NotificationBg = Color3.fromRGB(15, 20, 35) },
 	["Amethyst"] = { MainBg = Color3.fromRGB(20, 10, 30), MainBgTransparency = 0.2, SidebarBg = Color3.fromRGB(15, 8, 25), HeaderBg = Color3.fromRGB(30, 15, 45), Accent = Color3.fromRGB(180, 100, 255), AccentLight = Color3.fromRGB(150, 70, 240), Text = Color3.fromRGB(255, 255, 255), SubText = Color3.fromRGB(220, 200, 255), Stroke = Color3.fromRGB(180, 100, 255), Button = Color3.fromRGB(120, 60, 220), ToggleOn = Color3.fromRGB(180, 100, 255), ToggleOff = Color3.fromRGB(70, 60, 100), SliderFill = Color3.fromRGB(180, 100, 255), Panel = Color3.fromRGB(30, 20, 50), NotificationBg = Color3.fromRGB(25, 15, 45) },
@@ -199,7 +201,7 @@ local Themes = {
 local CurrentTheme = "Deep Ocean"
 local function GetTheme() return Themes[CurrentTheme] end
 
--- ===== ШРИФТЫ =====
+-- ===== FONTS =====
 local AvailableFonts = {
 	{Name = "Default", Font = Enum.Font.GothamBold},
 	{Name = "Fredoka One", Font = Enum.Font.FredokaOne},
@@ -211,7 +213,7 @@ local AvailableFonts = {
 local CurrentFont = AvailableFonts[1]
 local function GetFont() return CurrentFont.Font end
 
--- ===== УВЕДОМЛЕНИЯ =====
+-- ===== NOTIFICATIONS =====
 local activeNotifications = {}
 local NOTIFICATION_HEIGHT = 65
 local notifyGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
@@ -262,7 +264,7 @@ local function Notify(text)
 	end)
 end
 
--- ===== БАЗОВЫЕ ФУНКЦИИ =====
+-- ===== BASIC FUNCTIONS =====
 local function startThread(f) task.spawn(f) end
 local VirtualUser = game:GetService("VirtualUser")
 LocalPlayer.Idled:Connect(function()
@@ -271,7 +273,7 @@ LocalPlayer.Idled:Connect(function()
 	VirtualUser:Button2Up(Vector2.new(0,0), Camera.CFrame)
 end)
 
--- ===== НАСТРОЙКИ =====
+-- ===== SETTINGS =====
 local SettingsFileName = "NebulaHub_Settings.json"
 local DefaultConfig = {
 	Combat = {
@@ -317,7 +319,7 @@ for _, font in ipairs(AvailableFonts) do
 	if font.Name == Config.Font then CurrentFont = font; break end
 end
 
--- ===== РОЛИ =====
+-- ===== ROLES =====
 local function getPlayerRole(p)
 	if not p.Character then return "Unknown" end
 	for _,t in pairs(p.Character:GetChildren()) do
@@ -583,7 +585,6 @@ local function startKnifeAura()
 	end)
 end
 
--- Улучшенная функция экипировки ножа
 local function equipKnifeImproved()
 	local char = LocalPlayer.Character
 	if not char then return false end
@@ -607,7 +608,6 @@ local function equipKnifeImproved()
 	return false
 end
 
--- Улучшенная функция удара ножом
 local function swingKnifeImproved()
 	local char = LocalPlayer.Character
 	if not char then return false end
@@ -622,7 +622,6 @@ local function swingKnifeImproved()
 	return false
 end
 
--- Функция мгновенного убийства всех (непрерывный ТП всех + удары)
 local function killAllInstant()
 	local char = LocalPlayer.Character
 	if not char then Notify(translate("notify_no_knife")); return end
@@ -706,7 +705,7 @@ local function shootMurdererSilent()
 	end)
 end
 
--- ===== КЛЮЧЕВОЕ ОКНО =====
+-- ===== KEY WINDOW =====
 function ShowKeyWindow()
 	local g = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 	g.Name = "KeyWindow"; g.ResetOnSpawn = false
@@ -766,8 +765,6 @@ function ShowKeyWindow()
 			submit.Visible = false; getKey.Visible = false; inp.Visible = false; errorLabel.Visible = false
 			task.wait(0.5)
 			g:Destroy()
-
-			-- Теперь всегда открываем GUI (плавающую кнопку убрали)
 			CreateMainGUI()
 		else
 			errorLabel.Text = "Неверный ключ!"; inp.Text = ""
@@ -776,7 +773,7 @@ function ShowKeyWindow()
 	inp.FocusLost:Connect(function(enter) if enter then submit.MouseButton1Click:Fire() end end)
 end
 
--- ==================== ОСНОВНОЙ GUI ====================
+-- ==================== MAIN GUI ====================
 function CreateMainGUI()
 	local oldGui = LocalPlayer.PlayerGui:FindFirstChild("NebulaHub")
 	if oldGui then oldGui:Destroy() end
@@ -785,11 +782,8 @@ function CreateMainGUI()
 	gui.Name = "NebulaHub"; gui.ResetOnSpawn = false; gui.IgnoreGuiInset = true
 	gui.DisplayOrder = 1
 
-	-- Адаптивный размер для мобильных
 	local guiWidth, guiHeight = 680, 480
-	if IsMobile then
-		guiWidth, guiHeight = 420, 380
-	end
+	if IsMobile then guiWidth, guiHeight = 420, 380 end
 
 	local main = Instance.new("Frame", gui)
 	main.Name = "MainFrame"
@@ -801,7 +795,6 @@ function CreateMainGUI()
 	local mainCorner = Instance.new("UICorner", main); mainCorner.CornerRadius = UDim.new(0,20)
 	local mainStroke = Instance.new("UIStroke", main); mainStroke.Color = GetTheme().Stroke; mainStroke.Thickness = 1.5; mainStroke.Transparency = 0.3
 
-	-- Фоновое изображение внутри main
 	local bgImage = Instance.new("ImageLabel", main)
 	bgImage.Name = "BackgroundImage"
 	bgImage.Size = UDim2.new(1, 0, 1, 0); bgImage.Position = UDim2.new(0, 0, 0, 0)
@@ -838,7 +831,6 @@ function CreateMainGUI()
 	toggleBtn.ZIndex = 3
 	local toggleCorner = Instance.new("UICorner", toggleBtn); toggleCorner.CornerRadius = UDim.new(0,8)
 
-	-- Прокручиваемый список вкладок
 	local logoHeight = IsMobile and 100 or 140
 	local tabContainer = Instance.new("ScrollingFrame", sidebar)
 	tabContainer.Size = UDim2.new(1, 0, 1, -30 - logoHeight)
@@ -855,10 +847,9 @@ function CreateMainGUI()
 	tabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 	tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-	-- Логотип внизу сайдбара (непрозрачный фон)
 	local logoFrame = Instance.new("Frame", sidebar)
 	logoFrame.Size = UDim2.new(1,0,0,logoHeight); logoFrame.Position = UDim2.new(0,0,1,-logoHeight)
-	logoFrame.BackgroundColor3 = GetTheme().Panel; logoFrame.BackgroundTransparency = 0  -- <-- убрана прозрачность
+	logoFrame.BackgroundColor3 = GetTheme().Panel; logoFrame.BackgroundTransparency = 0 -- opaque
 	logoFrame.ZIndex = 2
 	local lfCorner = Instance.new("UICorner", logoFrame); lfCorner.CornerRadius = UDim.new(0,20)
 	table.insert(styleElements, {Object = logoFrame, Property = "BackgroundColor3", Key = "Panel"})
@@ -938,7 +929,7 @@ function CreateMainGUI()
 		end)
 	end
 
-	-- ===== ВИДЖЕТЫ =====
+	-- ===== WIDGETS =====
 	local function CreateToggle(parent, textKey, default, callback, notifyKey)
 		local c = Instance.new("Frame", parent)
 		c.Size = UDim2.new(0.9, 0, 0, 38)
@@ -1183,8 +1174,8 @@ function CreateMainGUI()
 		return container
 	end
 
-	-- ===== ЗАПОЛНЕНИЕ ВКЛАДОК =====
-	-- ВКЛАДКА HOME (индекс 1)
+	-- ===== FILL TABS =====
+	-- Home (index 1)
 	local homeContent = tabContents[1]
 
 	local profileFrame = Instance.new("Frame", homeContent)
@@ -1276,7 +1267,7 @@ function CreateMainGUI()
 	creditsLabel.TextColor3 = GetTheme().SubText; creditsLabel.Font = GetFont(); creditsLabel.TextSize = 13; creditsLabel.TextWrapped = true; creditsLabel.TextXAlignment = Enum.TextXAlignment.Left
 	creditsLabel.ZIndex = 4
 
-	-- ВКЛАДКА COMBAT (индекс 2)
+	-- Combat (index 2)
 	local combatContent = tabContents[2]
 	local sheriffSection = Instance.new("Frame", combatContent)
 	sheriffSection.Size = UDim2.new(0.9, 0, 0, 285); sheriffSection.BackgroundColor3 = GetTheme().Panel; sheriffSection.BackgroundTransparency = 0.6; sheriffSection.BorderSizePixel = 0
@@ -1309,7 +1300,7 @@ function CreateMainGUI()
 	CreateSlider(murdererSection, "slider_aura_radius", 5,100, Config.Combat.Murderer.KnifeAura.Radius or 30, " studs", function(v) Config.Combat.Murderer.KnifeAura.Radius = v; knifeAuraRadius = v end).Position = UDim2.new(0,0,0,68)
 	CreateButton(murdererSection, "button_kill_all", killAllInstant).Position = UDim2.new(0,0,0,128)
 
-	-- ВКЛАДКА ESP (индекс 3)
+	-- ESP (index 3)
 	local espContent = tabContents[3]
 	CreateToggle(espContent, "toggle_esp", Config.ESP.Enabled, function(v) Config.ESP.Enabled = v end, "notify_esp")
 	CreateToggle(espContent, "toggle_box", Config.ESP.Box, function(v) Config.ESP.Box = v end, nil)
@@ -1318,7 +1309,77 @@ function CreateMainGUI()
 	CreateSlider(espContent, "slider_tracer_thickness", 1,5, Config.ESP.TracerThickness or 1, "px", function(v) Config.ESP.TracerThickness = v end)
 	CreateToggle(espContent, "toggle_item_esp", Config.ESP.ItemESP, function(v) Config.ESP.ItemESP = v end, nil)
 
-	-- ВКЛАДКА MOVE (индекс 4)
+	-- ESP logic (restored)
+	local playerConnections = {}
+	local function setupESP(plr)
+		if not plr.Character then return end
+		local char = plr.Character
+		if not char:FindFirstChild("ESPBox") then
+			local hl = Instance.new("Highlight")
+			hl.Name = "ESPBox"
+			hl.Parent = char
+			hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+		end
+	end
+	local function removeESP(plr)
+		if plr.Character then
+			local hl = plr.Character:FindFirstChild("ESPBox")
+			if hl then hl:Destroy() end
+		end
+	end
+
+	startThread(function()
+		while true do
+			pcall(function()
+				if Config.ESP.Enabled then
+					for _, plr in ipairs(Players:GetPlayers()) do
+						if plr ~= LocalPlayer then
+							if not playerConnections[plr] then
+								playerConnections[plr] = true
+								if plr.Character then setupESP(plr) end
+								plr.CharacterAdded:Connect(function() task.wait(0.3) setupESP(plr) end)
+							else
+								if plr.Character and not plr.Character:FindFirstChild("ESPBox") then setupESP(plr) end
+							end
+						end
+					end
+				else
+					for plr, _ in pairs(playerConnections) do removeESP(plr); playerConnections[plr] = nil end
+				end
+			end)
+			task.wait(1)
+		end
+	end)
+
+	startThread(function()
+		while true do
+			pcall(function()
+				if Config.ESP.Enabled then
+					for _, plr in ipairs(Players:GetPlayers()) do
+						if plr ~= LocalPlayer and plr.Character then
+							local hl = plr.Character:FindFirstChild("ESPBox")
+							if hl then
+								local boxOn = Config.ESP.Box
+								local fillOn = Config.ESP.FilledBox
+								hl.Enabled = boxOn or fillOn
+								hl.OutlineTransparency = boxOn and 0 or 1
+								hl.FillTransparency = fillOn and 0.3 or 1
+								local role = getPlayerRole(plr)
+								local rc = Config.ESP.BoxColor
+								if role == "Sheriff" then rc = Color3.fromRGB(50,150,255)
+								elseif role == "Murderer" then rc = Color3.fromRGB(255,50,50) end
+								hl.OutlineColor = rc
+								hl.FillColor = rc
+							end
+						end
+					end
+				end
+			end)
+			task.wait(0.1)
+		end
+	end)
+
+	-- Move (index 4)
 	local moveContent = tabContents[4]
 	CreateToggle(moveContent, "toggle_custom_walkspeed", Config.Movement.CustomWalkSpeed, function(v) 
 		Config.Movement.CustomWalkSpeed = v
@@ -1369,7 +1430,7 @@ function CreateMainGUI()
 		if v then Notify(translate("notify_anti_fling_enabled")) else Notify(translate("notify_anti_fling_disabled")) end
 	end, nil)
 
-	-- ВКЛАДКА VISUALS (индекс 5)
+	-- Visuals (index 5)
 	local visContent = tabContents[5]
 	CreateToggle(visContent, "toggle_time_changer", Config.Visuals.TimeChanger, function(v) Config.Visuals.TimeChanger = v end, nil)
 	CreateSlider(visContent, "slider_time", 0,24, Config.Visuals.Time, "h", function(v) Config.Visuals.Time = v end)
@@ -1409,12 +1470,11 @@ function CreateMainGUI()
 		end)
 	end, nil)
 
-	-- ВКЛАДКА FARM (индекс 6)
+	-- Farm (index 6)
 	local farmContent = tabContents[6]
 	CreateToggle(farmContent, "toggle_auto_farm", Config.Farm.AutoFarm, function(v) Config.Farm.AutoFarm = v end, "notify_auto_farm")
 	CreateToggle(farmContent, "toggle_auto_pause_farm", Config.Farm.AutoPauseFarm, function(v) Config.Farm.AutoPauseFarm = v end, nil)
 
-	-- XP Farm тоггл
 	local xpFarmToggle = CreateToggle(farmContent, "toggle_xp_farm", Config.Farm.XPFarm or false, function(v)
 		Config.Farm.XPFarm = v
 		if v then
@@ -1429,7 +1489,6 @@ function CreateMainGUI()
 		SaveSettings()
 	end, nil)
 
-	-- AutoKillAll с проверкой XP Farm
 	local autoKillAllToggle
 	autoKillAllToggle = CreateToggle(farmContent, "toggle_autokill_all", Config.Farm.AutoKillAll, function(v)
 		if v and Config.Farm.XPFarm then
@@ -1441,7 +1500,6 @@ function CreateMainGUI()
 		SaveSettings()
 	end, nil)
 
-	-- FlingMurderer с проверкой XP Farm
 	local flingMurdererToggle
 	flingMurdererToggle = CreateToggle(farmContent, "toggle_fling_murderer", Config.Farm.FlingMurderer, function(v)
 		if v and Config.Farm.XPFarm then
@@ -1455,7 +1513,6 @@ function CreateMainGUI()
 
 	CreateSlider(farmContent, "slider_farm_speed", 10, 200, Config.Farm.FarmSpeed, " s/s", function(v) Config.Farm.FarmSpeed = v end)
 
-	-- Метка трекинга монет
 	local coinsLabel = Instance.new("TextLabel", farmContent)
 	coinsLabel.Name = "CoinsLabel"
 	coinsLabel.Size = UDim2.new(0.9, 0, 0, 20)
@@ -1466,7 +1523,7 @@ function CreateMainGUI()
 	coinsLabel.TextSize = 14
 	coinsLabel.ZIndex = 4
 
-	-- ВКЛАДКА TP (индекс 7)
+	-- TP (index 7)
 	local tpContent = tabContents[7]
 	CreateButton(tpContent, "button_stop_fling", stopFling).BackgroundColor3 = Color3.fromRGB(200,50,50)
 
@@ -1523,7 +1580,7 @@ function CreateMainGUI()
 	refreshPlayerList()
 	task.spawn(function() while true do task.wait(2) refreshPlayerList() end end)
 
-	-- ВКЛАДКА SETTINGS (индекс 8)
+	-- Settings (index 8)
 	local setContent = tabContents[8]
 
 	local function ApplyTheme(themeName)
@@ -1579,7 +1636,7 @@ function CreateMainGUI()
 	CreateButton(setContent, "button_save_settings", SaveSettings)
 	ApplyTheme(CurrentTheme)
 
-	-- ===== ДРАГГИНГ =====
+	-- ===== DRAGGING =====
 	local drag, dragStart, startPos = false, nil, nil
 	header.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -1589,7 +1646,7 @@ function CreateMainGUI()
 	header.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end end)
 	startThread(function() while true do if drag then local delta = UserInputService:GetMouseLocation() - dragStart; main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset+delta.X, startPos.Y.Scale, startPos.Y.Offset+delta.Y) end; RunService.RenderStepped:Wait() end end)
 
-	-- ===== АНИМАЦИЯ ПОЯВЛЕНИЯ =====
+	-- ===== ANIMATION =====
 	main.BackgroundTransparency = 1
 	main.Size = UDim2.new(0,0,0,0)
 	task.wait(0.1)
@@ -1616,21 +1673,21 @@ function CreateMainGUI()
 		end
 	end)
 
-	-- ===== ВИЗУАЛЬНЫЕ ЭФФЕКТЫ =====
+	-- ===== VISUALS EFFECTS =====
 	startThread(function() while true do
 		if Config.Visuals.TimeChanger then Lighting.TimeOfDay = Config.Visuals.Time..":00:00" end
 		if Config.Visuals.ColorCorrection then
-			if not Lighting:FindFirstChild("CCEffect") then
+			if not Lighting:FindFirstChild("CCEffect") then 
 				local cc = Instance.new("ColorCorrectionEffect", Lighting); cc.Name = "CCEffect"; cc.Saturation = 0.5; cc.Contrast = 0.5
 			end
-		else
+		else 
 			local cc = Lighting:FindFirstChild("CCEffect"); if cc then cc:Destroy() end
 		end
 		if not Config.Visuals.StretchScreen then Camera.FieldOfView = Config.Visuals.FOV or 70 end
 		task.wait()
 	end end)
 
-	-- ===== АИМБОТ (адаптирован для мобильных) =====
+	-- ===== AIMBOT =====
 	startThread(function() while true do pcall(function()
 		local shouldAim = false
 		if Config.Combat.Sheriff.Aimbot.Enabled then
@@ -1673,46 +1730,62 @@ function CreateMainGUI()
 		end
 	end) RunService.RenderStepped:Wait() end end)
 
-	-- ===== ESP TRACERS =====
+	-- ===== ESP TRACERS (with dynamic thickness) =====
 	local tracers = {}
-	local lastThick = Config.ESP.TracerThickness or 1
 	RunService.RenderStepped:Connect(function()
 		if Config.ESP.Enabled and Config.ESP.Tracers then
+			local thick = Config.ESP.TracerThickness or 1
 			for _, plr in ipairs(Players:GetPlayers()) do
 				if plr ~= LocalPlayer and plr.Character then
 					local root = plr.Character:FindFirstChild("HumanoidRootPart")
 					if root then
 						local pos, on = Camera:WorldToViewportPoint(root.Position)
 						if on then
-							if not tracers[plr] then tracers[plr] = Drawing.new("Line"); tracers[plr].Thickness = lastThick; tracers[plr].Transparency = 0.8 end
-							tracers[plr].Visible = true; tracers[plr].From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y); tracers[plr].To = Vector2.new(pos.X, pos.Y)
+							if not tracers[plr] then
+								tracers[plr] = Drawing.new("Line")
+								tracers[plr].Thickness = thick
+								tracers[plr].Transparency = 0.8
+							end
+							tracers[plr].Visible = true
+							tracers[plr].From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+							tracers[plr].To = Vector2.new(pos.X, pos.Y)
+							tracers[plr].Thickness = thick  -- update thickness
 							local role = getPlayerRole(plr)
-							if role == "Murderer" then tracers[plr].Color = Color3.new(1,0,0) elseif role == "Sheriff" then tracers[plr].Color = Color3.new(0,0.5,1) else tracers[plr].Color = Color3.new(1,1,1) end
-						else if tracers[plr] then tracers[plr].Visible = false end end
+							if role == "Murderer" then tracers[plr].Color = Color3.new(1,0,0)
+							elseif role == "Sheriff" then tracers[plr].Color = Color3.new(0,0.5,1)
+							else tracers[plr].Color = Color3.new(1,1,1) end
+						else
+							if tracers[plr] then tracers[plr].Visible = false end
+						end
 					end
 				end
 			end
-			for plr, line in pairs(tracers) do if not plr or not plr.Parent or not plr.Character then line:Remove(); tracers[plr] = nil end end
-		else for plr, line in pairs(tracers) do line:Remove(); tracers[plr] = nil end end
+			for plr, line in pairs(tracers) do
+				if not plr or not plr.Parent or not plr.Character then
+					line:Remove()
+					tracers[plr] = nil
+				end
+			end
+		else
+			for plr, line in pairs(tracers) do
+				line:Remove()
+				tracers[plr] = nil
+			end
+		end
 	end)
 
 	startThread(function() while true do if Config.ESP.ItemESP then for _,v in pairs(workspace:GetDescendants()) do if v.Name == "GunDrop" and v:IsA("BasePart") and not v:FindFirstChild("Highlight") then Instance.new("Highlight", v).FillColor = Color3.fromHSV(tick()%5/5,1,1) end end else for _,v in pairs(workspace:GetDescendants()) do if v:FindFirstChild("Highlight") and v.Name == "GunDrop" then v.Highlight:Destroy() end end end; task.wait(1) end end)
 
-	-- ===== ДВИЖЕНИЕ (ИСПРАВЛЕННЫЙ FLY) =====
+	-- ===== MOVEMENT (fly etc.) =====
 	startThread(function() while true do pcall(function()
 		if Config.Movement.Fly and LocalPlayer.Character then
-			local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-			local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
+			local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart"); local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
 			if hrp and hum then
 				hum.PlatformStand = true
 				local spd = Config.Movement.WalkSpeed * Config.Movement.FlySpeed
-
 				local camLook = Camera.CFrame.LookVector
 				local flatLook = Vector3.new(camLook.X, 0, camLook.Z).Unit
-				if flatLook.Magnitude > 0 then
-					hrp.CFrame = CFrame.new(hrp.Position, hrp.Position + flatLook)
-				end
-
+				if flatLook.Magnitude > 0 then hrp.CFrame = CFrame.new(hrp.Position, hrp.Position + flatLook) end
 				local vel = Vector3.zero
 				if UserInputService:IsKeyDown(Enum.KeyCode.W) then vel += Camera.CFrame.LookVector * spd end
 				if UserInputService:IsKeyDown(Enum.KeyCode.S) then vel -= Camera.CFrame.LookVector * spd end
@@ -1726,12 +1799,12 @@ function CreateMainGUI()
 				hrp.Velocity = vel
 			end
 		elseif LocalPlayer.Character then
-			local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
-			if hum and hum.PlatformStand then hum.PlatformStand = false end
+			local hum = LocalPlayer.Character:FindFirstChild("Humanoid"); if hum and hum.PlatformStand then hum.PlatformStand = false end
 		end
 	end) RunService.Heartbeat:Wait() end end)
 
 	startThread(function() while true do pcall(function() if Config.Movement.Noclip and LocalPlayer.Character then for _, p in ipairs(LocalPlayer.Character:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end end end) RunService.Stepped:Wait() end end)
+
 	startThread(function() while true do pcall(function() if Config.Movement.BHop and LocalPlayer.Character then local hum = LocalPlayer.Character:FindFirstChild("Humanoid"); if hum and hum.MoveDirection.Magnitude > 0 and hum.FloorMaterial ~= Enum.Material.Air then hum:ChangeState(Enum.HumanoidStateType.Jumping) end end end) task.wait(0.05) end end)
 
 	LocalPlayer.CharacterAdded:Connect(function(char)
@@ -1769,7 +1842,7 @@ function CreateMainGUI()
 		end)
 	end)
 
-	-- ===== УМНЫЙ ФАРМ + KILL MODE + XP FARM (ТОЧНЫЙ ТРЕКИНГ ЧЕРЕЗ COINCOLLECTED) =====
+	-- ===== SMART FARM + KILL MODE + XP FARM =====
 	local farmPaused = false
 	local xpFarmPaused = false
 	local Gameplay = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Gameplay")
@@ -1897,7 +1970,7 @@ function CreateMainGUI()
 			firetouchinterest(hrp, coin, 1)
 			task.wait(0.05)
 			if not isCoinVisible(coin) then
-				-- монета подобрана (трекинг учтён через CoinCollected)
+				-- coin collected
 			else
 				coin.CFrame = CFrame.new(originalPos)
 			end
@@ -1981,7 +2054,7 @@ function CreateMainGUI()
 		end
 	end)
 
-	-- Обновление трекинга монет на экране
+	-- Update coins label
 	startThread(function()
 		while true do
 			local hoursPassed = (tick() - sessionStartTime) / 3600
@@ -1993,7 +2066,7 @@ function CreateMainGUI()
 		end
 	end)
 
-	-- ===== ГОРЯЧИЕ КЛАВИШИ (отключены на мобилке) =====
+	-- ===== HOTKEYS =====
 	UserInputService.InputBegan:Connect(function(input, gameProcessed)
 		if IsMobile then return end
 		if input.KeyCode == Enum.KeyCode.T and not gameProcessed then
